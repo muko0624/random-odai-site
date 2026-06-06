@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ランダムお題ジェネレーター</title>
+  <title>ランダムお題ジェネレーター ＆ タイマー</title>
   <style>
     * {
       box-sizing: border-box;
@@ -109,6 +109,13 @@
       box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35);
     }
 
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    /* お題カード */
     .card {
       position: relative;
       overflow: hidden;
@@ -116,7 +123,7 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 22px;
       padding: 28px;
-      min-height: 300px;
+      min-height: 280px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -167,7 +174,7 @@
 
     .odai {
       margin: 0;
-      font-size: clamp(24px, 4vw, 38px);
+      font-size: clamp(24px, 4vw, 36px);
       line-height: 1.5;
       font-weight: 800;
       word-break: break-word;
@@ -184,9 +191,95 @@
       display: flex;
       flex-wrap: wrap;
       gap: 14px;
-      margin-top: 24px;
+      margin-top: 10px;
     }
 
+    /* タイマーカード */
+    .timer-card {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 22px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .timer-title {
+      margin: 0;
+      font-size: 15px;
+      color: var(--sub);
+      font-weight: 700;
+    }
+
+    .time-display {
+      font-size: clamp(56px, 8vw, 72px);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.02em;
+      margin: 4px 0;
+      color: var(--text);
+      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: color 0.3s ease;
+    }
+
+    .time-display.ending {
+      color: var(--badge1);
+    }
+
+    .time-display.time-up {
+      color: var(--badge2);
+      animation: flashText 0.6s ease infinite alternate;
+    }
+
+    @keyframes flashText {
+      from { opacity: 1; text-shadow: 0 0 15px rgba(239, 68, 68, 0.8); }
+      to { opacity: 0.5; text-shadow: none; }
+    }
+
+    .timer-presets {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .timer-preset-btn {
+      appearance: none;
+      background: var(--tab);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex: 1;
+      min-width: 60px;
+      max-width: 100px;
+    }
+
+    .timer-preset-btn:hover {
+      background: var(--tab-hover);
+    }
+    
+    .timer-preset-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent1);
+      color: var(--accent1);
+    }
+
+    .timer-controls {
+      display: flex;
+      gap: 14px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* 共通ボタン */
     .btn {
       appearance: none;
       border: none;
@@ -196,6 +289,9 @@
       font-weight: 700;
       cursor: pointer;
       transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+      flex: 1;
+      max-width: 200px;
+      text-align: center;
     }
 
     .btn:hover {
@@ -229,6 +325,15 @@
       border: 1px solid rgba(255,255,255,0.08);
     }
 
+    .message {
+      margin-top: 20px;
+      min-height: 24px;
+      font-size: 15px;
+      color: #bfdbfe;
+      text-align: center;
+      font-weight: 700;
+    }
+
     .footer {
       margin-top: 18px;
       color: var(--muted);
@@ -237,31 +342,28 @@
       line-height: 1.8;
     }
 
-    .message {
-      margin-top: 10px;
-      min-height: 24px;
-      font-size: 14px;
-      color: #bfdbfe;
-      text-align: center;
-      font-weight: 700;
+    @media (min-width: 768px) {
+      .content-grid {
+        grid-template-columns: 3fr 2fr;
+      }
+      .card {
+        margin-bottom: 0;
+      }
     }
 
     @media (max-width: 640px) {
       .app {
         padding: 18px;
       }
-
-      .card {
+      .card, .timer-card {
         padding: 22px 18px;
-        min-height: 280px;
       }
-
-      .actions {
+      .actions, .timer-controls {
         flex-direction: column;
       }
-
       .btn {
         width: 100%;
+        max-width: none;
       }
     }
   </style>
@@ -284,16 +386,39 @@
       <button class="tab" data-category="presentation">発表会スピーチ</button>
     </section>
 
-    <section class="card" id="card">
-      <span class="badge" id="categoryBadge">ランダム</span>
-      <h2 class="odai" id="odaiText">ボタンを押してお題を表示してください。</h2>
-      <p class="sub" id="subText">カテゴリを選んでからお題を出すこともできます。</p>
-    </section>
+    <div class="content-grid">
+      <!-- 左側：お題エリア -->
+      <div>
+        <section class="card" id="card">
+          <span class="badge" id="categoryBadge">ランダム</span>
+          <h2 class="odai" id="odaiText">ボタンを押してお題を表示してください。</h2>
+          <p class="sub" id="subText">カテゴリを選んでからお題を出すこともできます。</p>
+        </section>
 
-    <section class="actions">
-      <button class="btn btn-main" id="generateBtn">お題を出す</button>
-      <button class="btn btn-sub" id="copyBtn">お題をコピー</button>
-    </section>
+        <section class="actions">
+          <button class="btn btn-main" id="generateBtn">お題を出す</button>
+          <button class="btn btn-sub" id="copyBtn">お題をコピー</button>
+        </section>
+      </div>
+
+      <!-- 右側（PC）/下部（スマホ）：タイマーエリア -->
+      <section class="timer-card">
+        <h3 class="timer-title">スピーチタイマー</h3>
+        <div class="time-display" id="timeDisplay">01:00</div>
+        
+        <div class="timer-presets">
+          <button class="timer-preset-btn active" data-time="60">1分</button>
+          <button class="timer-preset-btn" data-time="180">3分</button>
+          <button class="timer-preset-btn" data-time="300">5分</button>
+          <button class="timer-preset-btn" data-time="600">10分</button>
+        </div>
+
+        <div class="timer-controls">
+          <button class="btn btn-main" id="startStopBtn">スタート</button>
+          <button class="btn btn-sub" id="resetBtn">リセット</button>
+        </div>
+      </section>
+    </div>
 
     <div class="message" id="message"></div>
 
@@ -304,6 +429,7 @@
   </main>
 
   <script>
+    // --- お題データ ---
     const odaiData = {
       speech: [
         "最近一番うれしかった出来事を1分で話してください。",
@@ -330,7 +456,18 @@
         "理想の休日の過ごし方を話してください。",
         "自分が大切にしている価値観を話してください。",
         "最近新しく始めたことを話してください。",
-        "一番好きな場所について話してください。"
+        "一番好きな場所について話してください。",
+        // 以下、新規追加分（ホット・気づき）
+        "最近「これ、タイパ（タイムパフォーマンス）がいいな」と感動した体験を教えてください。",
+        "あえて何も情報を入れない「デジタルデトックス」の時間を過ごしてみた感想、またはその必要性を語ってください。",
+        "最近体験した、あるいは注目している「推し活」の熱量や魅力についてスピーチしてください。",
+        "あなたが日常生活の中で「これこそがエシカル（地球や社会に優しい）だな」と感じる選択を1つ紹介してください。",
+        "『これぞ私のサードプレイス（自宅でも職場でもない落ち着く第3の場所）』と呼べる空間を教えてください。",
+        "生成AI（ChatGPTなど）を初めて使ったときの驚きや、日頃どう活用しているかを話してください。",
+        "SNSで見かける「丁寧な暮らし」と「リアルな日常」のギャップについて思うことを話してください。",
+        "最近、自分の『学び直し（リスキリング）』として興味を持っている分野やスキルを語ってください。",
+        "「週休3日制」がもし自分の環境に導入されたら、増えた1日をどう過ごすか具体的にスピーチしてください。",
+        "コンビニや街中で見つけて「これは新しい！」と感じた最新のヒット商品やトレンドを教えてください。"
       ],
       qa: [
         "無人島に1つだけ持っていくなら何を選びますか。",
@@ -357,7 +494,18 @@
         "自分の性格を一言で表すと何ですか。",
         "好きなイベントや行事は何ですか。",
         "旅行に行くなら山と海のどちらを選びますか。",
-        "朝起きて最初にすることは何ですか。"
+        "朝起きて最初にすることは何ですか。",
+        // 以下、新規追加分（ホット・気づき）
+        "もし、あなた専属の「AIアシスタント」が何でも言うことを聞いてくれるなら、まず何を頼みますか。",
+        "「人生100年時代」と言われますが、あなたは何歳まで現役で働き、どんなシニアになりたいですか。",
+        "サブスク（定額制サービス）を1つだけ残してすべて解約しなければならないとしたら、どれを残しますか。",
+        "ここ1、2年で『自分の価値観や考え方がガラッと変わったな』と思うことは何ですか。",
+        "最近、誰かから言われてハッとさせられたり、心に深く刺さったりした一言は何ですか。",
+        "「スマートウォッチ」や「スマート家電」など、あなたを最もラクにしてくれたテクノロジーは何ですか。",
+        "飲食店での「ロボット配膳」や「完全セルフレジ」、あなたは人との関わりが減って寂しいですか、それとも快適ですか。",
+        "もしも1年間、どこでも好きな場所で「リモートワーク（または留学）」ができるなら、世界のどこを選びますか。",
+        "普段の買い物で、価格の安さと「長く使える質の良さ（または環境への配慮）」のどちらを重視しますか。",
+        "最近、自分が「ちょっと古い考え方に囚われていたな」と気づいたエピソードがあれば教えてください。"
       ],
       opinion: [
         "学校の制服は必要だと思いますか。",
@@ -384,7 +532,18 @@
         "趣味は人生に必要だと思いますか。",
         "失敗は成功に必要だと思いますか。",
         "朝食は毎日必ず食べるべきだと思いますか。",
-        "人前で話す力は全員に必要だと思いますか。"
+        "人前で話す力は全員に必要だと思いますか。",
+        // 以下、新規追加分（ホット・気づき）
+        "AIが作ったアートや小説がコンテストで賞を取ることについて、あなたはどう思いますか。",
+        "動画の「倍速視聴」やショート動画の流行は、人間の集中力や文化を豊かにすると思いますか、それとも損ねると思いますか。",
+        "近い将来、企業の採用面接がすべて「AI面接官」によって行われるとしたら、それは公平だと思いますか。",
+        "会社や学校での「固定席（マイスペース）」と「フリーアドレス（自由席）」、どちらが生産性を上げると思いますか。",
+        "ニュースのコメント欄やSNSでの「誹謗中傷」を防ぐため、ネットは完全実名制にするべきだと思いますか。",
+        "若者の間で広まる「ミニマリズム（物を最小限にする暮らし）」は、経済や個人の幸福に良い影響を与えると思いますか。",
+        "学校や職場で、年齢やキャリアに関係なくお互いを「〜さん」と敬称で呼び合う取り組みについてどう思いますか。",
+        "プラスチック製品の削減やEV（電気自動車）の推進など、環境対策のルールはもっと罰則を伴う厳しいものにすべきですか。",
+        "「お金の管理や投資の知識（金融教育）」は、学生時代から義務教育として大々的に教えるべきだと思いますか。",
+        "ワークライフバランス（仕事と生活の調和）において、「仕事への情熱」と「プライベートの確保」はどちらを最優先すべきでしょうか。"
       ],
       presentation: [
         "10年後の理想の学校について発表してください。",
@@ -411,7 +570,18 @@
         "観光客に選ばれる地域づくりについて発表してください。",
         "学校行事をもっと魅力的にする案を発表してください。",
         "災害時の情報共有の重要性について発表してください。",
-        "これからの時代に必要な学び方を発表してください。"
+        "これからの時代に必要な学び方を発表してください。",
+        // 以下、新規追加分（ホット・気づき）
+        "【バーチャル時代の新たな提案】メタバース（仮想空間）を活用した、これまでにない新しいイベントや働き方のアイデアを発表してください。",
+        "【孤独・孤立を防ぐアイデア】現代社会の課題である「孤立」を防ぎ、地域の人々が自然とつながれるコミュニティスペースを提案してください。",
+        "【フードロスの新戦略】規格外の野菜や余った食材を、ITやアプリの力を使って楽しく、かつ美味しく消費する画期的な仕組みを発表してください。",
+        "【インバウンド（訪日観光客）の未来】外国人観光客が、有名観光地（東京・京都など）以外の大切な地方の魅力を体験できる新しいツアーを提案してください。",
+        "【空き家問題の解決策】全国で増え続けている「空き家」をリノベーションし、若者や新しい働き手がつどう魅力的な施設にする案を発表してください。",
+        "【シン・健康経営】ストレス社会を生き抜くために、学校や職場で毎日のスケジュールに強制的に組み込むべき「こころのケア（メンタルウェルネス）習慣」を提案してください。",
+        "【ジェンダーフリーな環境づくり】制服や施設のデザイン、言葉遣いに至るまで、誰もが居心地よく過ごせる「一歩進んだバリアフリーな空間」を提案してください。",
+        "【ニュース離れへの対策】若者が世の中のフェイクニュースを見抜き、政治や世界の重要な出来事に自然と興味を持てるような情報メディアの形を発表してください。",
+        "【リスキリングの仕組み化】大人たちが働きながら無理なく新しいITスキルや知識を習得できる、モチベーションが続く学習プラットフォームを提案してください。",
+        "【未来の移動手段（モビリティ）】自動運転や電動キックボード、ドローンが普及した社会で、交通弱者（高齢者や過疎地の人）を救う次世代の移動システムを発表してください。"
       ]
     };
 
@@ -431,6 +601,7 @@
       presentation: "発表会向けのお題を表示しています。"
     };
 
+    // --- お題ジェネレーターロジック ---
     let currentCategory = "all";
     let currentOdai = "";
     let lastOdai = "";
@@ -455,10 +626,7 @@
     }
 
     function getTargetList() {
-      if (currentCategory === "all") {
-        return getAllOdai();
-      }
-
+      if (currentCategory === "all") return getAllOdai();
       return odaiData[currentCategory].map((text) => ({
         category: currentCategory,
         text
@@ -468,13 +636,11 @@
     function pickRandomWithoutImmediateRepeat(list) {
       if (list.length === 0) return null;
       if (list.length === 1) return list[0];
-
       let selected;
       do {
         const index = Math.floor(Math.random() * list.length);
         selected = list[index];
       } while (selected.text === lastOdai);
-
       return selected;
     }
 
@@ -483,7 +649,7 @@
       clearTimeout(showMessage.timer);
       showMessage.timer = setTimeout(() => {
         message.textContent = "";
-      }, 1800);
+      }, 2000);
     }
 
     function animateCard() {
@@ -539,11 +705,9 @@
         showMessage("先にお題を表示してください");
         return;
       }
-
       try {
         if (navigator.clipboard && window.isSecureContext) {
           await navigator.clipboard.writeText(currentOdai);
-          showMessage("お題をコピーしました");
         } else {
           const temp = document.createElement("textarea");
           temp.value = currentOdai;
@@ -554,15 +718,108 @@
           temp.select();
           document.execCommand("copy");
           document.body.removeChild(temp);
-          showMessage("お題をコピーしました");
         }
+        showMessage("お題をコピーしました");
       } catch (error) {
         showMessage("コピーできませんでした");
       }
     });
 
-    // 初期表示
+    // --- タイマーロジック ---
+    const timeDisplay = document.getElementById("timeDisplay");
+    const presetBtns = document.querySelectorAll(".timer-preset-btn");
+    const startStopBtn = document.getElementById("startStopBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    let timerInterval = null;
+    let remainingSeconds = 60;
+    let isTimerRunning = false;
+    let currentPresetSeconds = 60; // 初期値1分
+
+    function updateTimeDisplay() {
+      const m = Math.floor(remainingSeconds / 60).toString().padStart(2, "0");
+      const s = (remainingSeconds % 60).toString().padStart(2, "0");
+      timeDisplay.textContent = `${m}:${s}`;
+
+      if (remainingSeconds <= 10 && remainingSeconds > 0) {
+        timeDisplay.classList.add("ending");
+        timeDisplay.classList.remove("time-up");
+      } else if (remainingSeconds <= 0) {
+        timeDisplay.classList.remove("ending");
+        timeDisplay.classList.add("time-up");
+      } else {
+        timeDisplay.classList.remove("ending", "time-up");
+      }
+    }
+
+    function setPreset(seconds) {
+      currentPresetSeconds = seconds;
+      remainingSeconds = seconds;
+      updateTimeDisplay();
+      stopTimer();
+      timeDisplay.classList.remove("time-up", "ending");
+      
+      presetBtns.forEach(btn => {
+        if (parseInt(btn.dataset.time) === seconds) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
+        }
+      });
+    }
+
+    function startTimer() {
+      if (remainingSeconds <= 0) return;
+      isTimerRunning = true;
+      startStopBtn.textContent = "一時停止";
+      startStopBtn.classList.replace("btn-main", "btn-sub");
+      
+      timerInterval = setInterval(() => {
+        remainingSeconds--;
+        updateTimeDisplay();
+        
+        if (remainingSeconds <= 0) {
+          stopTimer();
+          showMessage("時間になりました！");
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      isTimerRunning = false;
+      clearInterval(timerInterval);
+      startStopBtn.textContent = "スタート";
+      startStopBtn.classList.replace("btn-sub", "btn-main");
+    }
+
+    startStopBtn.addEventListener("click", () => {
+      if (isTimerRunning) {
+        stopTimer();
+      } else {
+        startTimer();
+      }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      stopTimer();
+      remainingSeconds = currentPresetSeconds;
+      updateTimeDisplay();
+      timeDisplay.classList.remove("time-up", "ending");
+      showMessage("タイマーをリセットしました");
+    });
+
+    presetBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const secs = parseInt(btn.dataset.time);
+        setPreset(secs);
+        showMessage(`${btn.textContent}に設定しました`);
+      });
+    });
+
+    // 初期化実行
     showRandomOdai();
+    setPreset(60);
+
   </script>
 </body>
 </html>
