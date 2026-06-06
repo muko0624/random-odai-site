@@ -9,32 +9,56 @@
       box-sizing: border-box;
     }
 
+    :root {
+      --bg1: #0f172a;
+      --bg2: #1e293b;
+      --bg3: #334155;
+      --text: #ffffff;
+      --sub: #cbd5e1;
+      --muted: #94a3b8;
+      --card: rgba(15, 23, 42, 0.78);
+      --border: rgba(255, 255, 255, 0.12);
+      --tab: rgba(255, 255, 255, 0.08);
+      --tab-hover: rgba(255, 255, 255, 0.16);
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+
+      --accent1: #38bdf8;
+      --accent2: #6366f1;
+      --main1: #22c55e;
+      --main2: #06b6d4;
+      --badge1: #f59e0b;
+      --badge2: #ef4444;
+    }
+
     body {
       margin: 0;
       font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e293b, #334155);
-      color: #fff;
+      color: var(--text);
       min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(99, 102, 241, 0.18), transparent 30%),
+        linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       padding: 24px;
     }
 
     .app {
       width: 100%;
-      max-width: 920px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      max-width: 980px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid var(--border);
       backdrop-filter: blur(12px);
       border-radius: 24px;
       padding: 28px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      box-shadow: var(--shadow);
     }
 
     .header {
       text-align: center;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
 
     .header h1 {
@@ -45,52 +69,89 @@
 
     .header p {
       margin: 0;
-      color: #cbd5e1;
+      color: var(--sub);
       font-size: 15px;
       line-height: 1.8;
     }
 
     .tabs {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 12px;
       margin-bottom: 24px;
     }
 
     .tab {
-      border: none;
+      appearance: none;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: var(--tab);
+      color: #fff;
       padding: 14px 12px;
       border-radius: 14px;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      background: rgba(255, 255, 255, 0.08);
-      color: white;
-      transition: 0.25s ease;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
     }
 
     .tab:hover {
+      background: var(--tab-hover);
       transform: translateY(-2px);
-      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .tab:active {
+      transform: scale(0.97);
     }
 
     .tab.active {
-      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
       border-color: transparent;
       box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35);
     }
 
     .card {
-      background: rgba(15, 23, 42, 0.75);
+      position: relative;
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 22px;
       padding: 28px;
-      min-height: 280px;
+      min-height: 300px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      gap: 18px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: auto -40px -40px auto;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.2), transparent 70%);
+      pointer-events: none;
+    }
+
+    .card.flash {
+      animation: flashCard 0.45s ease;
+    }
+
+    @keyframes flashCard {
+      0% {
+        transform: scale(0.99);
+        border-color: rgba(255,255,255,0.10);
+      }
+      50% {
+        transform: scale(1.01);
+        border-color: rgba(56, 189, 248, 0.7);
+        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.10);
+      }
+      100% {
+        transform: scale(1);
+        border-color: rgba(255,255,255,0.08);
+      }
     }
 
     .badge {
@@ -98,23 +159,23 @@
       align-self: flex-start;
       padding: 8px 14px;
       border-radius: 999px;
-      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      background: linear-gradient(135deg, var(--badge1), var(--badge2));
       font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.05em;
     }
 
     .odai {
+      margin: 0;
       font-size: clamp(24px, 4vw, 38px);
       line-height: 1.5;
       font-weight: 800;
-      margin: 0;
       word-break: break-word;
     }
 
     .sub {
       margin: 0;
-      color: #cbd5e1;
+      color: var(--sub);
       font-size: 14px;
       line-height: 1.8;
     }
@@ -127,53 +188,62 @@
     }
 
     .btn {
+      appearance: none;
       border: none;
       border-radius: 14px;
       padding: 14px 20px;
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
-      transition: 0.25s ease;
+      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      opacity: 0.96;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
     }
 
     .btn-main {
-      background: linear-gradient(135deg, #22c55e, #06b6d4);
       color: white;
+      background: linear-gradient(135deg, var(--main1), var(--main2));
       box-shadow: 0 10px 25px rgba(6, 182, 212, 0.25);
+    }
+
+    .btn-main.clicked {
+      animation: pulseBtn 0.35s ease;
+    }
+
+    @keyframes pulseBtn {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.96); }
+      100% { transform: scale(1); }
     }
 
     .btn-sub {
       background: rgba(255, 255, 255, 0.1);
       color: white;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .btn:hover {
-      transform: translateY(-2px);
-      opacity: 0.95;
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
     .footer {
       margin-top: 18px;
-      color: #94a3b8;
+      color: var(--muted);
       font-size: 13px;
       text-align: center;
       line-height: 1.8;
     }
 
-    .fade {
-      animation: fadeIn 0.35s ease;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .message {
+      margin-top: 10px;
+      min-height: 24px;
+      font-size: 14px;
+      color: #bfdbfe;
+      text-align: center;
+      font-weight: 700;
     }
 
     @media (max-width: 640px) {
@@ -183,7 +253,7 @@
 
       .card {
         padding: 22px 18px;
-        min-height: 250px;
+        min-height: 280px;
       }
 
       .actions {
@@ -201,8 +271,8 @@
     <header class="header">
       <h1>ランダムお題ジェネレーター</h1>
       <p>
-        ボタンを押すとランダムでお題を表示します。<br>
-        スピーチ・質疑応答・意見生成・発表会スピーチに切り替え可能です。
+        ボタンを押すとランダムでお題を表示します。<br />
+        スピーチ・質疑応答・意見生成・発表会スピーチを切り替えできます。
       </p>
     </header>
 
@@ -214,10 +284,10 @@
       <button class="tab" data-category="presentation">発表会スピーチ</button>
     </section>
 
-    <section class="card fade" id="card">
+    <section class="card" id="card">
       <span class="badge" id="categoryBadge">ランダム</span>
       <h2 class="odai" id="odaiText">ボタンを押してお題を表示してください。</h2>
-      <p class="sub" id="subText">カテゴリを選択してからランダム表示もできます。</p>
+      <p class="sub" id="subText">カテゴリを選んでからお題を出すこともできます。</p>
     </section>
 
     <section class="actions">
@@ -225,9 +295,11 @@
       <button class="btn btn-sub" id="copyBtn">お題をコピー</button>
     </section>
 
+    <div class="message" id="message"></div>
+
     <p class="footer">
-      お題の内容はコード内で自由に追加・編集できます。<br>
-      VS Code に貼り付けて、すぐに公開できるシンプル構成です。
+      このファイル1つで動作します。<br />
+      VS Code に貼り付けて保存し、ブラウザで開いてご利用ください。
     </p>
   </main>
 
@@ -243,8 +315,22 @@
         "スマホがない生活について話してください。",
         "好きな季節とその理由を説明してください。",
         "自分の長所を1つテーマにして話してください。",
-        "学生時代に頑張ったことを話してください。"
-        "あなたの好きな映画について話してください。"
+        "学生時代に頑張ったことを話してください。",
+        "今いちばん挑戦したいことを話してください。",
+        "あなたにとって理想の一日を説明してください。",
+        "最近感動したことを話してください。",
+        "将来住んでみたい場所について話してください。",
+        "自分を成長させた失敗体験を話してください。",
+        "好きな食べ物について魅力を語ってください。",
+        "忘れられない先生や先輩について話してください。",
+        "自分のリフレッシュ方法を話してください。",
+        "おすすめしたい本や映画を紹介してください。",
+        "時間の使い方で意識していることを話してください。",
+        "これまでで一番緊張した瞬間を話してください。",
+        "理想の休日の過ごし方を話してください。",
+        "自分が大切にしている価値観を話してください。",
+        "最近新しく始めたことを話してください。",
+        "一番好きな場所について話してください。"
       ],
       qa: [
         "無人島に1つだけ持っていくなら何を選びますか。",
@@ -256,7 +342,22 @@
         "尊敬する人はどんな人ですか。",
         "自分を動物にたとえると何だと思いますか。",
         "最近学んだことを1つ教えてください。",
-        "今もっとも大切にしている時間は何ですか。"
+        "今もっとも大切にしている時間は何ですか。",
+        "宝くじで100万円当たったら何に使いますか。",
+        "最近笑った出来事を教えてください。",
+        "今まででもっとも練習したことは何ですか。",
+        "今住んでいる地域の良いところは何ですか。",
+        "好きな教科または仕事の内容は何ですか。",
+        "友達に自分を紹介してもらうとしたら何と言われそうですか。",
+        "一日だけ別の職業を体験できるなら何をしますか。",
+        "好きな言葉や座右の銘はありますか。",
+        "今の自分に必要だと思うものは何ですか。",
+        "一番落ち着く時間帯はいつですか。",
+        "最近頑張ったことを教えてください。",
+        "自分の性格を一言で表すと何ですか。",
+        "好きなイベントや行事は何ですか。",
+        "旅行に行くなら山と海のどちらを選びますか。",
+        "朝起きて最初にすることは何ですか。"
       ],
       opinion: [
         "学校の制服は必要だと思いますか。",
@@ -268,7 +369,22 @@
         "SNSは人間関係を豊かにすると言えると思いますか。",
         "旅行は国内派か海外派か、意見を述べてください。",
         "朝勉強と夜勉強はどちらが効率的だと思いますか。",
-        "紙のノートとデジタルノートのどちらが優れていると思いますか。"
+        "紙のノートとデジタルノートのどちらが優れていると思いますか。",
+        "学校でのスマホ利用はもっと自由であるべきだと思いますか。",
+        "オンライン授業は対面授業の代わりになると思いますか。",
+        "努力と才能のどちらが大切だと思いますか。",
+        "給食や社員食堂のメニューは選択式が良いと思いますか。",
+        "ルールは厳しい方が良いと思いますか。",
+        "チーム作業と個人作業のどちらが成果を出しやすいと思いますか。",
+        "都会と地方、住むならどちらが良いと思いますか。",
+        "英語教育はもっと早い段階で始めるべきだと思いますか。",
+        "宿題は必要だと思いますか。",
+        "情報収集はテレビよりインターネットの方が優れていると思いますか。",
+        "買い物は実店舗とネット通販のどちらが良いと思いますか。",
+        "趣味は人生に必要だと思いますか。",
+        "失敗は成功に必要だと思いますか。",
+        "朝食は毎日必ず食べるべきだと思いますか。",
+        "人前で話す力は全員に必要だと思いますか。"
       ],
       presentation: [
         "10年後の理想の学校について発表してください。",
@@ -280,7 +396,22 @@
         "日本の観光地を1つ選び魅力を発表してください。",
         "睡眠の大切さについて発表してください。",
         "学校に導入したい新しい制度を提案してください。",
-        "防災意識を高めるための取り組みを発表してください。"
+        "防災意識を高めるための取り組みを発表してください。",
+        "地域活性化のためのアイデアを発表してください。",
+        "自分の学校や職場をより良くする提案をしてください。",
+        "食品ロスを減らす方法について発表してください。",
+        "健康的な生活習慣について発表してください。",
+        "AIと共存する未来社会について発表してください。",
+        "地球温暖化対策として個人ができることを発表してください。",
+        "理想の通学・通勤環境について発表してください。",
+        "子どもが安心して暮らせる町について発表してください。",
+        "読書の魅力を広める方法を発表してください。",
+        "スポーツの価値について発表してください。",
+        "高齢者にやさしい社会づくりについて発表してください。",
+        "観光客に選ばれる地域づくりについて発表してください。",
+        "学校行事をもっと魅力的にする案を発表してください。",
+        "災害時の情報共有の重要性について発表してください。",
+        "これからの時代に必要な学び方を発表してください。"
       ]
     };
 
@@ -292,8 +423,17 @@
       presentation: "発表会スピーチ"
     };
 
+    const categoryDescriptions = {
+      all: "全カテゴリからランダムで表示しています。",
+      speech: "スピーチ向けのお題を表示しています。",
+      qa: "質疑応答向けのお題を表示しています。",
+      opinion: "意見を述べるお題を表示しています。",
+      presentation: "発表会向けのお題を表示しています。"
+    };
+
     let currentCategory = "all";
     let currentOdai = "";
+    let lastOdai = "";
 
     const tabs = document.querySelectorAll(".tab");
     const card = document.getElementById("card");
@@ -302,15 +442,7 @@
     const subText = document.getElementById("subText");
     const generateBtn = document.getElementById("generateBtn");
     const copyBtn = document.getElementById("copyBtn");
-
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        tabs.forEach((btn) => btn.classList.remove("active"));
-        tab.classList.add("active");
-        currentCategory = tab.dataset.category;
-        showRandomOdai();
-      });
-    });
+    const message = document.getElementById("message");
 
     function getAllOdai() {
       const all = [];
@@ -333,37 +465,103 @@
       }));
     }
 
-    function showRandomOdai() {
-      const list = getTargetList();
-      const randomIndex = Math.floor(Math.random() * list.length);
-      const selected = list[randomIndex];
+    function pickRandomWithoutImmediateRepeat(list) {
+      if (list.length === 0) return null;
+      if (list.length === 1) return list[0];
 
-      currentOdai = selected.text;
-      categoryBadge.textContent = categoryLabels[selected.category];
-      odaiText.textContent = selected.text;
-      subText.textContent = "もう一度ボタンを押すと別のお題が表示されます。";
+      let selected;
+      do {
+        const index = Math.floor(Math.random() * list.length);
+        selected = list[index];
+      } while (selected.text === lastOdai);
 
-      card.classList.remove("fade");
-      void card.offsetWidth;
-      card.classList.add("fade");
+      return selected;
     }
 
-    generateBtn.addEventListener("click", showRandomOdai);
+    function showMessage(text) {
+      message.textContent = text;
+      clearTimeout(showMessage.timer);
+      showMessage.timer = setTimeout(() => {
+        message.textContent = "";
+      }, 1800);
+    }
+
+    function animateCard() {
+      card.classList.remove("flash");
+      void card.offsetWidth;
+      card.classList.add("flash");
+    }
+
+    function animateButton() {
+      generateBtn.classList.remove("clicked");
+      void generateBtn.offsetWidth;
+      generateBtn.classList.add("clicked");
+    }
+
+    function showRandomOdai() {
+      const list = getTargetList();
+      const selected = pickRandomWithoutImmediateRepeat(list);
+
+      if (!selected) {
+        odaiText.textContent = "お題が見つかりません。";
+        subText.textContent = "データを確認してください。";
+        return;
+      }
+
+      currentOdai = selected.text;
+      lastOdai = selected.text;
+
+      categoryBadge.textContent = categoryLabels[selected.category];
+      odaiText.textContent = selected.text;
+      subText.textContent = categoryDescriptions[currentCategory];
+
+      animateCard();
+      animateButton();
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((btn) => btn.classList.remove("active"));
+        tab.classList.add("active");
+        currentCategory = tab.dataset.category;
+        showRandomOdai();
+        showMessage("カテゴリを切り替えました");
+      });
+    });
+
+    generateBtn.addEventListener("click", () => {
+      showRandomOdai();
+      showMessage("新しいお題を表示しました");
+    });
 
     copyBtn.addEventListener("click", async () => {
       if (!currentOdai) {
-        alert("先にお題を表示してください。");
+        showMessage("先にお題を表示してください");
         return;
       }
 
       try {
-        await navigator.clipboard.writeText(currentOdai);
-        alert("お題をコピーしました。");
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(currentOdai);
+          showMessage("お題をコピーしました");
+        } else {
+          const temp = document.createElement("textarea");
+          temp.value = currentOdai;
+          temp.style.position = "fixed";
+          temp.style.left = "-9999px";
+          document.body.appendChild(temp);
+          temp.focus();
+          temp.select();
+          document.execCommand("copy");
+          document.body.removeChild(temp);
+          showMessage("お題をコピーしました");
+        }
       } catch (error) {
-        alert("コピーに失敗しました。手動でコピーしてください。");
+        showMessage("コピーできませんでした");
       }
     });
 
+    // 初期表示
     showRandomOdai();
   </script>
 </body>
