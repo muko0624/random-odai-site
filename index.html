@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ランダムお題ジェネレーター</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b, #334155);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 920px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .header h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing: 0.03em;
+    }
+
+    .header p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      border: none;
+      padding: 14px 12px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      transition: 0.25s ease;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tab:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      border-color: transparent;
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.35);
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.75);
+      border-radius: 22px;
+      padding: 28px;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .badge {
+      display: inline-block;
+      align-self: flex-start;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .odai {
+      font-size: clamp(24px, 4vw, 38px);
+      line-height: 1.5;
+      font-weight: 800;
+      margin: 0;
+      word-break: break-word;
+    }
+
+    .sub {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.25s ease;
+    }
+
+    .btn-main {
+      background: linear-gradient(135deg, #22c55e, #06b6d4);
+      color: white;
+      box-shadow: 0 10px 25px rgba(6, 182, 212, 0.25);
+    }
+
+    .btn-sub {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+
+    .footer {
+      margin-top: 18px;
+      color: #94a3b8;
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .fade {
+      animation: fadeIn 0.35s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app {
+        padding: 18px;
+      }
+
+      .card {
+        padding: 22px 18px;
+        min-height: 250px;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <h1>ランダムお題ジェネレーター</h1>
+      <p>
+        ボタンを押すとランダムでお題を表示します。<br>
+        スピーチ・質疑応答・意見生成・発表会スピーチに切り替え可能です。
+      </p>
+    </header>
+
+    <section class="tabs">
+      <button class="tab active" data-category="all">ランダム</button>
+      <button class="tab" data-category="speech">スピーチ</button>
+      <button class="tab" data-category="qa">質疑応答</button>
+      <button class="tab" data-category="opinion">意見生成</button>
+      <button class="tab" data-category="presentation">発表会スピーチ</button>
+    </section>
+
+    <section class="card fade" id="card">
+      <span class="badge" id="categoryBadge">ランダム</span>
+      <h2 class="odai" id="odaiText">ボタンを押してお題を表示してください。</h2>
+      <p class="sub" id="subText">カテゴリを選択してからランダム表示もできます。</p>
+    </section>
+
+    <section class="actions">
+      <button class="btn btn-main" id="generateBtn">お題を出す</button>
+      <button class="btn btn-sub" id="copyBtn">お題をコピー</button>
+    </section>
+
+    <p class="footer">
+      お題の内容はコード内で自由に追加・編集できます。<br>
+      VS Code に貼り付けて、すぐに公開できるシンプル構成です。
+    </p>
+  </main>
+
+  <script>
+    const odaiData = {
+      speech: [
+        "最近一番うれしかった出来事を1分で話してください。",
+        "もし1か月休みが取れたら何をするか話してください。",
+        "子どもの頃に夢中になったことを紹介してください。",
+        "あなたの地元の魅力を伝えてください。",
+        "今までで一番印象に残っている旅行について話してください。",
+        "朝型生活のメリットをスピーチしてください。",
+        "スマホがない生活について話してください。",
+        "好きな季節とその理由を説明してください。",
+        "自分の長所を1つテーマにして話してください。",
+        "学生時代に頑張ったことを話してください。"
+        "あなたの好きな映画について話してください。"
+      ],
+      qa: [
+        "無人島に1つだけ持っていくなら何を選びますか。",
+        "今すぐ新しい趣味を始めるなら何を選びますか。",
+        "人生で一度は挑戦したいことは何ですか。",
+        "あなたにとって理想の休日とはどんな1日ですか。",
+        "一番好きな食べ物を1つだけ挙げるなら何ですか。",
+        "過去に戻れるならいつに戻りたいですか。",
+        "尊敬する人はどんな人ですか。",
+        "自分を動物にたとえると何だと思いますか。",
+        "最近学んだことを1つ教えてください。",
+        "今もっとも大切にしている時間は何ですか。"
+      ],
+      opinion: [
+        "学校の制服は必要だと思いますか。",
+        "リモートワークは今後さらに増えるべきだと思いますか。",
+        "現金よりキャッシュレス中心の社会の方が良いと思いますか。",
+        "AIは教育に積極的に導入すべきだと思いますか。",
+        "読書と動画学習、より効果的なのはどちらだと思いますか。",
+        "部活動は自由参加にするべきだと思いますか。",
+        "SNSは人間関係を豊かにすると言えると思いますか。",
+        "旅行は国内派か海外派か、意見を述べてください。",
+        "朝勉強と夜勉強はどちらが効率的だと思いますか。",
+        "紙のノートとデジタルノートのどちらが優れていると思いますか。"
+      ],
+      presentation: [
+        "10年後の理想の学校について発表してください。",
+        "未来のコンビニはどう進化するか発表してください。",
+        "自分が市長になったら実現したいことを発表してください。",
+        "これから必要とされる職業について発表してください。",
+        "環境にやさしい町づくりのアイデアを発表してください。",
+        "高校生に必要なお金の知識について発表してください。",
+        "日本の観光地を1つ選び魅力を発表してください。",
+        "睡眠の大切さについて発表してください。",
+        "学校に導入したい新しい制度を提案してください。",
+        "防災意識を高めるための取り組みを発表してください。"
+      ]
+    };
+
+    const categoryLabels = {
+      all: "ランダム",
+      speech: "スピーチ",
+      qa: "質疑応答",
+      opinion: "意見生成",
+      presentation: "発表会スピーチ"
+    };
+
+    let currentCategory = "all";
+    let currentOdai = "";
+
+    const tabs = document.querySelectorAll(".tab");
+    const card = document.getElementById("card");
+    const categoryBadge = document.getElementById("categoryBadge");
+    const odaiText = document.getElementById("odaiText");
+    const subText = document.getElementById("subText");
+    const generateBtn = document.getElementById("generateBtn");
+    const copyBtn = document.getElementById("copyBtn");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((btn) => btn.classList.remove("active"));
+        tab.classList.add("active");
+        currentCategory = tab.dataset.category;
+        showRandomOdai();
+      });
+    });
+
+    function getAllOdai() {
+      const all = [];
+      Object.keys(odaiData).forEach((category) => {
+        odaiData[category].forEach((text) => {
+          all.push({ category, text });
+        });
+      });
+      return all;
+    }
+
+    function getTargetList() {
+      if (currentCategory === "all") {
+        return getAllOdai();
+      }
+
+      return odaiData[currentCategory].map((text) => ({
+        category: currentCategory,
+        text
+      }));
+    }
+
+    function showRandomOdai() {
+      const list = getTargetList();
+      const randomIndex = Math.floor(Math.random() * list.length);
+      const selected = list[randomIndex];
+
+      currentOdai = selected.text;
+      categoryBadge.textContent = categoryLabels[selected.category];
+      odaiText.textContent = selected.text;
+      subText.textContent = "もう一度ボタンを押すと別のお題が表示されます。";
+
+      card.classList.remove("fade");
+      void card.offsetWidth;
+      card.classList.add("fade");
+    }
+
+    generateBtn.addEventListener("click", showRandomOdai);
+
+    copyBtn.addEventListener("click", async () => {
+      if (!currentOdai) {
+        alert("先にお題を表示してください。");
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(currentOdai);
+        alert("お題をコピーしました。");
+      } catch (error) {
+        alert("コピーに失敗しました。手動でコピーしてください。");
+      }
+    });
+
+    showRandomOdai();
+  </script>
+</body>
+</html>
