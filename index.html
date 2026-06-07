@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ランダムお題ジェネレーター ＆ タイマー</title>
+  <title>ランダムお題（単語）ジェネレーター ＆ タイマー</title>
   <style>
     * {
       box-sizing: border-box;
@@ -174,10 +174,11 @@
 
     .odai {
       margin: 0;
-      font-size: clamp(24px, 4vw, 36px);
+      font-size: clamp(28px, 5vw, 44px);
       line-height: 1.5;
       font-weight: 800;
       word-break: break-word;
+      text-align: center;
     }
 
     .sub {
@@ -185,6 +186,7 @@
       color: var(--sub);
       font-size: 14px;
       line-height: 1.8;
+      text-align: center;
     }
 
     .actions {
@@ -242,7 +244,7 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
       width: 100%;
     }
 
@@ -251,15 +253,16 @@
       background: var(--tab);
       border: 1px solid rgba(255,255,255,0.08);
       color: white;
-      padding: 10px 16px;
+      padding: 10px 12px;
       border-radius: 12px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.15s ease;
       flex: 1;
-      min-width: 60px;
-      max-width: 100px;
+      min-width: 55px;
+      max-width: 90px;
+      text-align: center;
     }
 
     .timer-preset-btn:hover {
@@ -379,7 +382,7 @@
     </header>
 
     <section class="tabs">
-      <button class="tab active" data-category="all">ランダム</button>
+      <button class="tab active" data-category="all">ランダム（単語）</button>
       <button class="tab" data-category="speech">スピーチ</button>
       <button class="tab" data-category="qa">質疑応答</button>
       <button class="tab" data-category="opinion">意見生成</button>
@@ -390,7 +393,7 @@
       <!-- 左側：お題エリア -->
       <div>
         <section class="card" id="card">
-          <span class="badge" id="categoryBadge">ランダム</span>
+          <span class="badge" id="categoryBadge">ランダム（単語）</span>
           <h2 class="odai" id="odaiText">ボタンを押してお題を表示してください。</h2>
           <p class="sub" id="subText">カテゴリを選んでからお題を出すこともできます。</p>
         </section>
@@ -401,16 +404,17 @@
         </section>
       </div>
 
-      <!-- 右側（PC）/下部（スマホ）：タイマーエリア -->
+      <!-- 右側：タイマーエリア -->
       <section class="timer-card">
         <h3 class="timer-title">スピーチタイマー</h3>
-        <div class="time-display" id="timeDisplay">01:00</div>
+        <div class="time-display" id="timeDisplay">00:10</div>
         
         <div class="timer-presets">
-          <button class="timer-preset-btn active" data-time="60">1分</button>
+          <button class="timer-preset-btn active" data-time="10">10秒</button>
+          <button class="timer-preset-btn" data-time="30">30秒</button>
+          <button class="timer-preset-btn" data-time="60">1分</button>
           <button class="timer-preset-btn" data-time="180">3分</button>
           <button class="timer-preset-btn" data-time="300">5分</button>
-          <button class="timer-preset-btn" data-time="600">10分</button>
         </div>
 
         <div class="timer-controls">
@@ -431,6 +435,19 @@
   <script>
     // --- お題データ ---
     const odaiData = {
+      // ランダム項目を幅広いジャンルの「単語」に変更（50個）
+      all: [
+        "生成AI", "タイパ（タイムパフォーマンス）", "デジタルデトックス", "サードプレイス", "リスキリング",
+        "フードロス", "メタバース", "キャッシュレス", "自動運転", "ミニマリズム",
+        "推し活", "エシカル（倫理的消費）", "リモートワーク", "ワークライフバランス", "サスティナブル",
+        "無人島", "タイムマシン", "宇宙旅行", "深海", "仮想現実（VR）",
+        "失敗体験", "モーニングルーティン", "効率化", "自由と責任", "言葉の力",
+        "嘘（うそ）", "秘密", "幸福の定義", "お金の使い方", "時間の使い方",
+        "朝活", "サウナ", "筋トレ", "お気に入りのカフェ", "ペットの癒やし",
+        "手作り弁当", "一人旅", "生涯の一本（映画）", "読書習慣", "アニメ文化",
+        "伝統祭り", "新幹線", "寿司", "カレーライス", "スマートウォッチ",
+        "丁寧な暮らし", "ルールの必要性", "故郷（地元）", "初恋の思い出", "未来の学校"
+      ],
       speech: [
         "最近一番うれしかった出来事を1分で話してください。",
         "もし1か月休みが取れたら何をするか話してください。",
@@ -457,7 +474,6 @@
         "自分が大切にしている価値観を話してください。",
         "最近新しく始めたことを話してください。",
         "一番好きな場所について話してください。",
-        // 以下、新規追加分（ホット・気づき）
         "最近「これ、タイパ（タイムパフォーマンス）がいいな」と感動した体験を教えてください。",
         "あえて何も情報を入れない「デジタルデトックス」の時間を過ごしてみた感想、またはその必要性を語ってください。",
         "最近体験した、あるいは注目している「推し活」の熱量や魅力についてスピーチしてください。",
@@ -495,7 +511,6 @@
         "好きなイベントや行事は何ですか。",
         "旅行に行くなら山と海のどちらを選びますか。",
         "朝起きて最初にすることは何ですか。",
-        // 以下、新規追加分（ホット・気づき）
         "もし、あなた専属の「AIアシスタント」が何でも言うことを聞いてくれるなら、まず何を頼みますか。",
         "「人生100年時代」と言われますが、あなたは何歳まで現役で働き、どんなシニアになりたいですか。",
         "サブスク（定額制サービス）を1つだけ残してすべて解約しなければならないとしたら、どれを残しますか。",
@@ -503,7 +518,7 @@
         "最近、誰かから言われてハッとさせられたり、心に深く刺さったりした一言は何ですか。",
         "「スマートウォッチ」や「スマート家電」など、あなたを最もラクにしてくれたテクノロジーは何ですか。",
         "飲食店での「ロボット配膳」や「完全セルフレジ」、あなたは人との関わりが減って寂しいですか、それとも快適ですか。",
-        "もしも1年間、どこでも好きな場所で「リモートワーク（または留学）」ができるなら、世界のどこを選びますか。",
+        "もしも1年間、どこでも好きな場所で「リモートワーク（あるいは留学）」ができるなら、世界のどこを選びますか。",
         "普段の買い物で、価格の安さと「長く使える質の良さ（または環境への配慮）」のどちらを重視しますか。",
         "最近、自分が「ちょっと古い考え方に囚われていたな」と気づいたエピソードがあれば教えてください。"
       ],
@@ -533,7 +548,6 @@
         "失敗は成功に必要だと思いますか。",
         "朝食は毎日必ず食べるべきだと思いますか。",
         "人前で話す力は全員に必要だと思いますか。",
-        // 以下、新規追加分（ホット・気づき）
         "AIが作ったアートや小説がコンテストで賞を取ることについて、あなたはどう思いますか。",
         "動画の「倍速視聴」やショート動画の流行は、人間の集中力や文化を豊かにすると思いますか、それとも損ねると思いますか。",
         "近い将来、企業の採用面接がすべて「AI面接官」によって行われるとしたら、それは公平だと思いますか。",
@@ -571,7 +585,6 @@
         "学校行事をもっと魅力的にする案を発表してください。",
         "災害時の情報共有の重要性について発表してください。",
         "これからの時代に必要な学び方を発表してください。",
-        // 以下、新規追加分（ホット・気づき）
         "【バーチャル時代の新たな提案】メタバース（仮想空間）を活用した、これまでにない新しいイベントや働き方のアイデアを発表してください。",
         "【孤独・孤立を防ぐアイデア】現代社会の課題である「孤立」を防ぎ、地域の人々が自然とつながれるコミュニティスペースを提案してください。",
         "【フードロスの新戦略】規格外の野菜や余った食材を、ITやアプリの力を使って楽しく、かつ美味しく消費する画期的な仕組みを発表してください。",
@@ -586,7 +599,7 @@
     };
 
     const categoryLabels = {
-      all: "ランダム",
+      all: "ランダム（単語）",
       speech: "スピーチ",
       qa: "質疑応答",
       opinion: "意見生成",
@@ -594,7 +607,7 @@
     };
 
     const categoryDescriptions = {
-      all: "全カテゴリからランダムで表示しています。",
+      all: "幅広いジャンルの「単語」がランダムで表示されます。連想トークに最適です。",
       speech: "スピーチ向けのお題を表示しています。",
       qa: "質疑応答向けのお題を表示しています。",
       opinion: "意見を述べるお題を表示しています。",
@@ -615,18 +628,7 @@
     const copyBtn = document.getElementById("copyBtn");
     const message = document.getElementById("message");
 
-    function getAllOdai() {
-      const all = [];
-      Object.keys(odaiData).forEach((category) => {
-        odaiData[category].forEach((text) => {
-          all.push({ category, text });
-        });
-      });
-      return all;
-    }
-
     function getTargetList() {
-      if (currentCategory === "all") return getAllOdai();
       return odaiData[currentCategory].map((text) => ({
         category: currentCategory,
         text
@@ -732,9 +734,9 @@
     const resetBtn = document.getElementById("resetBtn");
 
     let timerInterval = null;
-    let remainingSeconds = 60;
+    let remainingSeconds = 10;
     let isTimerRunning = false;
-    let currentPresetSeconds = 60; // 初期値1分
+    let currentPresetSeconds = 10; // 初期値10秒
 
     function updateTimeDisplay() {
       const m = Math.floor(remainingSeconds / 60).toString().padStart(2, "0");
@@ -818,7 +820,7 @@
 
     // 初期化実行
     showRandomOdai();
-    setPreset(60);
+    setPreset(10); // 初期プリセットを10秒に設定
 
   </script>
 </body>
