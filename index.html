@@ -32,7 +32,7 @@
 
     body {
       margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
       color: var(--text);
       min-height: 100vh;
       background:
@@ -50,7 +50,6 @@
       max-width: 980px;
       background: rgba(255, 255, 255, 0.07);
       border: 1px solid var(--border);
-      -webkit-backdrop-filter: blur(12px); /* Safari対応 */
       backdrop-filter: blur(12px);
       border-radius: 24px;
       padding: 28px;
@@ -83,7 +82,6 @@
     }
 
     .tab {
-      -webkit-appearance: none; /* Safari対応 */
       appearance: none;
       border: 1px solid rgba(255, 255, 255, 0.08);
       background: var(--tab);
@@ -221,7 +219,6 @@
       font-size: clamp(56px, 8vw, 72px);
       font-weight: 800;
       font-variant-numeric: tabular-nums;
-      -webkit-font-variant-numeric: tabular-nums; /* Safari対応 */
       letter-spacing: 0.02em;
       margin: 4px 0;
       color: var(--text);
@@ -252,7 +249,6 @@
     }
 
     .timer-preset-btn {
-      -webkit-appearance: none; /* Safari対応 */
       appearance: none;
       background: var(--tab);
       border: 1px solid rgba(255,255,255,0.08);
@@ -288,7 +284,6 @@
 
     /* 共通ボタン */
     .btn {
-      -webkit-appearance: none; /* Safari対応 */
       appearance: none;
       border: none;
       border-radius: 14px;
@@ -395,6 +390,7 @@
     </section>
 
     <div class="content-grid">
+      <!-- 左側：お題エリア -->
       <div>
         <section class="card" id="card">
           <span class="badge" id="categoryBadge">ランダム（単語）</span>
@@ -408,6 +404,7 @@
         </section>
       </div>
 
+      <!-- 右側：タイマーエリア -->
       <section class="timer-card">
         <h3 class="timer-title">スピーチタイマー</h3>
         <div class="time-display" id="timeDisplay">00:10</div>
@@ -438,6 +435,7 @@
   <script>
     // --- お題データ ---
     const odaiData = {
+      // ランダム項目を幅広いジャンルの「単語」に変更（50個）
       all: [
         "生成AI", "タイパ（タイムパフォーマンス）", "デジタルデトックス", "サードプレイス", "リスキリング",
         "フードロス", "メタバース", "キャッシュレス", "自動運転", "ミニマリズム",
@@ -566,4 +564,264 @@
         "未来のコンビニはどう進化するか発表してください。",
         "自分が市長になったら実現したいことを発表してください。",
         "これから必要とされる職業について発表してください。",
-        "環境にやさしい町
+        "環境にやさしい町づくりのアイデアを発表してください。",
+        "高校生に必要なお金の知識について発表してください。",
+        "日本の観光地を1つ選び魅力を発表してください。",
+        "睡眠の大切さについて発表してください。",
+        "学校に導入したい新しい制度を提案してください。",
+        "防災意識を高めるための取り組みを発表してください。",
+        "地域活性化のためのアイデアを発表してください。",
+        "自分の学校や職場をより良くする提案をしてください。",
+        "食品ロスを減らす方法について発表してください。",
+        "健康的な生活習慣について発表してください。",
+        "AIと共存する未来社会について発表してください。",
+        "地球温暖化対策として個人ができることを発表してください。",
+        "理想の通学・通勤環境について発表してください。",
+        "子どもが安心して暮らせる町について発表してください。",
+        "読書の魅力を広める方法を発表してください。",
+        "スポーツの価値について発表してください。",
+        "高齢者にやさしい社会づくりについて発表してください。",
+        "観光客に選ばれる地域づくりについて発表してください。",
+        "学校行事をもっと魅力的にする案を発表してください。",
+        "災害時の情報共有の重要性について発表してください。",
+        "これからの時代に必要な学び方を発表してください。",
+        "【バーチャル時代の新たな提案】メタバース（仮想空間）を活用した、これまでにない新しいイベントや働き方のアイデアを発表してください。",
+        "【孤独・孤立を防ぐアイデア】現代社会の課題である「孤立」を防ぎ、地域の人々が自然とつながれるコミュニティスペースを提案してください。",
+        "【フードロスの新戦略】規格外の野菜や余った食材を、ITやアプリの力を使って楽しく、かつ美味しく消費する画期的な仕組みを発表してください。",
+        "【インバウンド（訪日観光客）の未来】外国人観光客が、有名観光地（東京・京都など）以外の大切な地方の魅力を体験できる新しいツアーを提案してください。",
+        "【空き家問題の解決策】全国で増え続けている「空き家」をリノベーションし、若者や新しい働き手がつどう魅力的な施設にする案を発表してください。",
+        "【シン・健康経営】ストレス社会を生き抜くために、学校や職場で毎日のスケジュールに強制的に組み込むべき「こころのケア（メンタルウェルネス）習慣」を提案してください。",
+        "【ジェンダーフリーな環境づくり】制服や施設のデザイン、言葉遣いに至るまで、誰もが居心地よく過ごせる「一歩進んだバリアフリーな空間」を提案してください。",
+        "【ニュース離れへの対策】若者が世の中のフェイクニュースを見抜き、政治や世界の重要な出来事に自然と興味を持てるような情報メディアの形を発表してください。",
+        "【リスキリングの仕組み化】大人たちが働きながら無理なく新しいITスキルや知識を習得できる、モチベーションが続く学習プラットフォームを提案してください。",
+        "【未来の移動手段（モビリティ）】自動運転や電動キックボード、ドローンが普及した社会で、交通弱者（高齢者や過疎地の人）を救う次世代の移動システムを発表してください。"
+      ]
+    };
+
+    const categoryLabels = {
+      all: "ランダム（単語）",
+      speech: "スピーチ",
+      qa: "質疑応答",
+      opinion: "意見生成",
+      presentation: "発表会スピーチ"
+    };
+
+    const categoryDescriptions = {
+      all: "幅広いジャンルの「単語」がランダムで表示されます。連想トークに最適です。",
+      speech: "スピーチ向けのお題を表示しています。",
+      qa: "質疑応答向けのお題を表示しています。",
+      opinion: "意見を述べるお題を表示しています。",
+      presentation: "発表会向けのお題を表示しています。"
+    };
+
+    // --- お題ジェネレーターロジック ---
+    let currentCategory = "all";
+    let currentOdai = "";
+    let lastOdai = "";
+
+    const tabs = document.querySelectorAll(".tab");
+    const card = document.getElementById("card");
+    const categoryBadge = document.getElementById("categoryBadge");
+    const odaiText = document.getElementById("odaiText");
+    const subText = document.getElementById("subText");
+    const generateBtn = document.getElementById("generateBtn");
+    const copyBtn = document.getElementById("copyBtn");
+    const message = document.getElementById("message");
+
+    function getTargetList() {
+      return odaiData[currentCategory].map((text) => ({
+        category: currentCategory,
+        text
+      }));
+    }
+
+    function pickRandomWithoutImmediateRepeat(list) {
+      if (list.length === 0) return null;
+      if (list.length === 1) return list[0];
+      let selected;
+      do {
+        const index = Math.floor(Math.random() * list.length);
+        selected = list[index];
+      } while (selected.text === lastOdai);
+      return selected;
+    }
+
+    function showMessage(text) {
+      message.textContent = text;
+      clearTimeout(showMessage.timer);
+      showMessage.timer = setTimeout(() => {
+        message.textContent = "";
+      }, 2000);
+    }
+
+    function animateCard() {
+      card.classList.remove("flash");
+      void card.offsetWidth;
+      card.classList.add("flash");
+    }
+
+    function animateButton() {
+      generateBtn.classList.remove("clicked");
+      void generateBtn.offsetWidth;
+      generateBtn.classList.add("clicked");
+    }
+
+    function showRandomOdai() {
+      const list = getTargetList();
+      const selected = pickRandomWithoutImmediateRepeat(list);
+
+      if (!selected) {
+        odaiText.textContent = "お題が見つかりません。";
+        subText.textContent = "データを確認してください。";
+        return;
+      }
+
+      currentOdai = selected.text;
+      lastOdai = selected.text;
+
+      categoryBadge.textContent = categoryLabels[selected.category];
+      odaiText.textContent = selected.text;
+      subText.textContent = categoryDescriptions[currentCategory];
+
+      animateCard();
+      animateButton();
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((btn) => btn.classList.remove("active"));
+        tab.classList.add("active");
+        currentCategory = tab.dataset.category;
+        showRandomOdai();
+        showMessage("カテゴリを切り替えました");
+      });
+    });
+
+    generateBtn.addEventListener("click", () => {
+      showRandomOdai();
+      showMessage("新しいお題を表示しました");
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      if (!currentOdai) {
+        showMessage("先にお題を表示してください");
+        return;
+      }
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(currentOdai);
+        } else {
+          const temp = document.createElement("textarea");
+          temp.value = currentOdai;
+          temp.style.position = "fixed";
+          temp.style.left = "-9999px";
+          document.body.appendChild(temp);
+          temp.focus();
+          temp.select();
+          document.execCommand("copy");
+          document.body.removeChild(temp);
+        }
+        showMessage("お題をコピーしました");
+      } catch (error) {
+        showMessage("コピーできませんでした");
+      }
+    });
+
+    // --- タイマーロジック ---
+    const timeDisplay = document.getElementById("timeDisplay");
+    const presetBtns = document.querySelectorAll(".timer-preset-btn");
+    const startStopBtn = document.getElementById("startStopBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    let timerInterval = null;
+    let remainingSeconds = 10;
+    let isTimerRunning = false;
+    let currentPresetSeconds = 10; // 初期値10秒
+
+    function updateTimeDisplay() {
+      const m = Math.floor(remainingSeconds / 60).toString().padStart(2, "0");
+      const s = (remainingSeconds % 60).toString().padStart(2, "0");
+      timeDisplay.textContent = `${m}:${s}`;
+
+      if (remainingSeconds <= 10 && remainingSeconds > 0) {
+        timeDisplay.classList.add("ending");
+        timeDisplay.classList.remove("time-up");
+      } else if (remainingSeconds <= 0) {
+        timeDisplay.classList.remove("ending");
+        timeDisplay.classList.add("time-up");
+      } else {
+        timeDisplay.classList.remove("ending", "time-up");
+      }
+    }
+
+    function setPreset(seconds) {
+      currentPresetSeconds = seconds;
+      remainingSeconds = seconds;
+      updateTimeDisplay();
+      stopTimer();
+      timeDisplay.classList.remove("time-up", "ending");
+      
+      presetBtns.forEach(btn => {
+        if (parseInt(btn.dataset.time) === seconds) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
+        }
+      });
+    }
+
+    function startTimer() {
+      if (remainingSeconds <= 0) return;
+      isTimerRunning = true;
+      startStopBtn.textContent = "一時停止";
+      startStopBtn.classList.replace("btn-main", "btn-sub");
+      
+      timerInterval = setInterval(() => {
+        remainingSeconds--;
+        updateTimeDisplay();
+        
+        if (remainingSeconds <= 0) {
+          stopTimer();
+          showMessage("時間になりました！");
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      isTimerRunning = false;
+      clearInterval(timerInterval);
+      startStopBtn.textContent = "スタート";
+      startStopBtn.classList.replace("btn-sub", "btn-main");
+    }
+
+    startStopBtn.addEventListener("click", () => {
+      if (isTimerRunning) {
+        stopTimer();
+      } else {
+        startTimer();
+      }
+    });
+
+    resetBtn.addEventListener("click", () => {
+      stopTimer();
+      remainingSeconds = currentPresetSeconds;
+      updateTimeDisplay();
+      timeDisplay.classList.remove("time-up", "ending");
+      showMessage("タイマーをリセットしました");
+    });
+
+    presetBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const secs = parseInt(btn.dataset.time);
+        setPreset(secs);
+        showMessage(`${btn.textContent}に設定しました`);
+      });
+    });
+
+    // 初期化実行
+    showRandomOdai();
+    setPreset(10); // 初期プリセットを10秒に設定
+
+  </script>
+</body>
+</html>
