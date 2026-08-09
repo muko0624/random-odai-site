@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ランダムお題（単語）ジェネレーター ＆ タイマー</title>
+  <title>ランダムお題ジェネレーター ＆ タイマー ＆ 録音</title>
   <style>
     * {
       box-sizing: border-box;
@@ -115,6 +115,12 @@
       gap: 24px;
     }
 
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
     .card {
       position: relative;
       overflow: hidden;
@@ -195,7 +201,7 @@
       margin-top: 10px;
     }
 
-    .timer-card {
+    .timer-card, .record-card {
       background: var(--card);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 22px;
@@ -206,7 +212,7 @@
       gap: 16px;
     }
 
-    .timer-title {
+    .timer-title, .record-title {
       margin: 0;
       font-size: 15px;
       color: var(--sub);
@@ -273,7 +279,7 @@
       color: var(--accent1);
     }
 
-    .timer-controls {
+    .timer-controls, .record-controls {
       display: flex;
       gap: 14px;
       width: 100%;
@@ -294,13 +300,18 @@
       text-align: center;
     }
 
-    .btn:hover {
+    .btn:hover:not(:disabled) {
       transform: translateY(-2px);
       opacity: 0.96;
     }
 
-    .btn:active {
+    .btn:active:not(:disabled) {
       transform: scale(0.97);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .btn-main {
@@ -323,6 +334,32 @@
       background: rgba(255, 255, 255, 0.1);
       color: white;
       border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .record-status {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .record-status.recording {
+      color: var(--badge2);
+      animation: flashText 1s ease infinite alternate;
+    }
+
+    .record-status.recording::before {
+      content: "●";
+      color: var(--badge2);
+    }
+
+    audio {
+      width: 100%;
+      height: 40px;
+      border-radius: 12px;
+      outline: none;
     }
 
     .message {
@@ -355,10 +392,10 @@
       .app {
         padding: 18px;
       }
-      .card, .timer-card {
+      .card, .timer-card, .record-card {
         padding: 22px 18px;
       }
-      .actions, .timer-controls {
+      .actions, .timer-controls, .record-controls {
         flex-direction: column;
       }
       .btn {
@@ -387,6 +424,7 @@
     </section>
 
     <div class="content-grid">
+      <!-- 左パネル：お題エリア -->
       <div>
         <section class="card" id="card">
           <span class="badge" id="categoryBadge">ランダム（単語）</span>
@@ -400,23 +438,37 @@
         </section>
       </div>
 
-      <section class="timer-card">
-        <h3 class="timer-title">スピーチタイマー</h3>
-        <div class="time-display" id="timeDisplay">00:10</div>
-        
-        <div class="timer-presets">
-          <button class="timer-preset-btn active" data-time="10">10秒</button>
-          <button class="timer-preset-btn" data-time="30">30秒</button>
-          <button class="timer-preset-btn" data-time="60">1分</button>
-          <button class="timer-preset-btn" data-time="180">3分</button>
-          <button class="timer-preset-btn" data-time="300">5分</button>
-        </div>
+      <!-- 右パネル：タイマー＆録音エリア -->
+      <div class="side-panel">
+        <section class="timer-card">
+          <h3 class="timer-title">スピーチタイマー</h3>
+          <div class="time-display" id="timeDisplay">00:10</div>
+          
+          <div class="timer-presets">
+            <button class="timer-preset-btn active" data-time="10">10秒</button>
+            <button class="timer-preset-btn" data-time="30">30秒</button>
+            <button class="timer-preset-btn" data-time="60">1分</button>
+            <button class="timer-preset-btn" data-time="180">3分</button>
+            <button class="timer-preset-btn" data-time="300">5分</button>
+          </div>
 
-        <div class="timer-controls">
-          <button class="btn btn-main" id="startStopBtn">スタート</button>
-          <button class="btn btn-sub" id="resetBtn">リセット</button>
-        </div>
-      </section>
+          <div class="timer-controls">
+            <button class="btn btn-main" id="startStopBtn">スタート</button>
+            <button class="btn btn-sub" id="resetBtn">リセット</button>
+          </div>
+        </section>
+
+        <!-- 録音機能セクション -->
+        <section class="record-card">
+          <h3 class="record-title">スピーチ録音</h3>
+          <div class="record-status" id="recordStatus">待機中</div>
+          <div class="record-controls">
+            <button class="btn btn-main" id="startRecordBtn">録音開始</button>
+            <button class="btn btn-sub" id="stopRecordBtn" disabled>停止</button>
+          </div>
+          <audio id="audioPlayback" controls style="display: none;"></audio>
+        </section>
+      </div>
     </div>
 
     <div class="message" id="message"></div>
@@ -871,6 +923,7 @@
       presentation: "発表会向けのお題を表示しています。"
     };
 
+    // ▼ お題ジェネレーター関連の変数と要素
     let currentCategory = "all";
     let currentOdai = "";
     let lastOdai = "";
@@ -884,6 +937,27 @@
     const copyBtn = document.getElementById("copyBtn");
     const message = document.getElementById("message");
 
+    // ▼ タイマー関連の変数と要素
+    let timerInterval = null;
+    let initialTime = 10;
+    let timeRemaining = 10;
+
+    const timeDisplay = document.getElementById("timeDisplay");
+    const startStopBtn = document.getElementById("startStopBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const timerPresetBtns = document.querySelectorAll(".timer-preset-btn");
+
+    // ▼ 録音関連の変数と要素
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
+    const startRecordBtn = document.getElementById("startRecordBtn");
+    const stopRecordBtn = document.getElementById("stopRecordBtn");
+    const recordStatus = document.getElementById("recordStatus");
+    const audioPlayback = document.getElementById("audioPlayback");
+
+    // --- お題ジェネレーター処理 ---
     function getTargetList() {
       return odaiData[currentCategory].map((text) => ({
         category: currentCategory,
@@ -912,96 +986,62 @@
 
     function animateCard() {
       card.classList.remove("flash");
-      void card.offsetWidth;
+      void card.offsetWidth; // reflow
       card.classList.add("flash");
     }
 
-    function animateButton() {
-      generateBtn.classList.remove("clicked");
-      void generateBtn.offsetWidth;
-      generateBtn.classList.add("clicked");
-    }
-
-    function showRandomOdai() {
-      const list = getTargetList();
-      const selected = pickRandomWithoutImmediateRepeat(list);
-
-      if (!selected) {
-        odaiText.textContent = "お題が見つかりません。";
-        subText.textContent = "データを確認してください。";
-        return;
-      }
-
-      currentOdai = selected.text;
-      lastOdai = selected.text;
-
-      categoryBadge.textContent = categoryLabels[selected.category];
-      odaiText.textContent = selected.text;
-      subText.textContent = categoryDescriptions[currentCategory];
-
-      animateCard();
-      animateButton();
-    }
-
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        tabs.forEach((btn) => btn.classList.remove("active"));
-        tab.classList.add("active");
-        currentCategory = tab.dataset.category;
-        showRandomOdai();
-        showMessage("カテゴリを切り替えました");
+    // タブ切り替え処理
+    tabs.forEach(tab => {
+      tab.addEventListener("click", (e) => {
+        tabs.forEach(t => t.classList.remove("active"));
+        e.target.classList.add("active");
+        currentCategory = e.target.dataset.category;
       });
     });
 
+    // お題生成ボタン処理
     generateBtn.addEventListener("click", () => {
-      showRandomOdai();
-      showMessage("新しいお題を表示しました");
+      generateBtn.classList.add("clicked");
+      setTimeout(() => generateBtn.classList.remove("clicked"), 350);
+
+      const list = getTargetList();
+      const selected = pickRandomWithoutImmediateRepeat(list);
+      if (selected) {
+        currentOdai = selected.text;
+        lastOdai = selected.text;
+        odaiText.textContent = selected.text;
+        categoryBadge.textContent = categoryLabels[selected.category];
+        subText.textContent = categoryDescriptions[selected.category];
+        animateCard();
+      }
     });
 
+    // コピーボタン処理
     copyBtn.addEventListener("click", async () => {
       if (!currentOdai) {
-        showMessage("先にお題を表示してください");
+        showMessage("コピーするお題がありません");
         return;
       }
       try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(currentOdai);
-        } else {
-          const temp = document.createElement("textarea");
-          temp.value = currentOdai;
-          temp.style.position = "fixed";
-          temp.style.left = "-9999px";
-          document.body.appendChild(temp);
-          temp.focus();
-          temp.select();
-          document.execCommand("copy");
-          document.body.removeChild(temp);
-        }
-        showMessage("お題をコピーしました");
-      } catch (error) {
-        showMessage("コピーできませんでした");
+        await navigator.clipboard.writeText(currentOdai);
+        showMessage("クリップボードにコピーしました！");
+      } catch (err) {
+        showMessage("コピーに失敗しました");
       }
     });
 
-    const timeDisplay = document.getElementById("timeDisplay");
-    const presetBtns = document.querySelectorAll(".timer-preset-btn");
-    const startStopBtn = document.getElementById("startStopBtn");
-    const resetBtn = document.getElementById("resetBtn");
 
-    let timerInterval = null;
-    let remainingSeconds = 10;
-    let isTimerRunning = false;
-    let currentPresetSeconds = 10;
-
+    // --- タイマー処理 ---
     function updateTimeDisplay() {
-      const m = Math.floor(remainingSeconds / 60).toString().padStart(2, "0");
-      const s = (remainingSeconds % 60).toString().padStart(2, "0");
-      timeDisplay.textContent = `${m}:${s}`;
+      const minutes = Math.floor(timeRemaining / 60).toString().padStart(2, "0");
+      const seconds = (timeRemaining % 60).toString().padStart(2, "0");
+      timeDisplay.textContent = `${minutes}:${seconds}`;
 
-      if (remainingSeconds <= 10 && remainingSeconds > 0) {
+      // 残り時間による色変化
+      if (timeRemaining <= 3 && timeRemaining > 0) {
         timeDisplay.classList.add("ending");
         timeDisplay.classList.remove("time-up");
-      } else if (remainingSeconds <= 0) {
+      } else if (timeRemaining === 0) {
         timeDisplay.classList.remove("ending");
         timeDisplay.classList.add("time-up");
       } else {
@@ -1009,72 +1049,119 @@
       }
     }
 
-    function setPreset(seconds) {
-      currentPresetSeconds = seconds;
-      remainingSeconds = seconds;
-      updateTimeDisplay();
-      stopTimer();
-      timeDisplay.classList.remove("time-up", "ending");
-      
-      presetBtns.forEach(btn => {
-        if (parseInt(btn.dataset.time) === seconds) {
-          btn.classList.add("active");
-        } else {
-          btn.classList.remove("active");
-        }
-      });
-    }
-
-    function startTimer() {
-      if (remainingSeconds <= 0) return;
-      isTimerRunning = true;
-      startStopBtn.textContent = "一時停止";
-      startStopBtn.classList.replace("btn-main", "btn-sub");
-      
-      timerInterval = setInterval(() => {
-        remainingSeconds--;
+    timerPresetBtns.forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        timerPresetBtns.forEach(b => b.classList.remove("active"));
+        e.target.classList.add("active");
+        
+        initialTime = parseInt(e.target.dataset.time, 10);
+        timeRemaining = initialTime;
         updateTimeDisplay();
         
-        if (remainingSeconds <= 0) {
-          stopTimer();
-          showMessage("時間になりました！");
+        // タイマー動作中なら停止する
+        if (timerInterval) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          startStopBtn.textContent = "スタート";
         }
-      }, 1000);
-    }
-
-    function stopTimer() {
-      isTimerRunning = false;
-      clearInterval(timerInterval);
-      startStopBtn.textContent = "スタート";
-      startStopBtn.classList.replace("btn-sub", "btn-main");
-    }
+      });
+    });
 
     startStopBtn.addEventListener("click", () => {
-      if (isTimerRunning) {
-        stopTimer();
+      if (timerInterval) {
+        // ストップ処理
+        clearInterval(timerInterval);
+        timerInterval = null;
+        startStopBtn.textContent = "スタート";
       } else {
-        startTimer();
+        // スタート処理
+        if (timeRemaining === 0) {
+          timeRemaining = initialTime; // 0ならリセットして開始
+          updateTimeDisplay();
+        }
+        startStopBtn.textContent = "ストップ";
+        
+        timerInterval = setInterval(() => {
+          if (timeRemaining > 0) {
+            timeRemaining--;
+            updateTimeDisplay();
+          } else {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            startStopBtn.textContent = "スタート";
+          }
+        }, 1000);
       }
     });
 
     resetBtn.addEventListener("click", () => {
-      stopTimer();
-      remainingSeconds = currentPresetSeconds;
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        startStopBtn.textContent = "スタート";
+      }
+      timeRemaining = initialTime;
       updateTimeDisplay();
-      timeDisplay.classList.remove("time-up", "ending");
-      showMessage("タイマーをリセットしました");
     });
 
-    presetBtns.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const secs = parseInt(btn.dataset.time);
-        setPreset(secs);
-        showMessage(`${btn.textContent}に設定しました`);
-      });
+
+    // --- 録音機能処理 ---
+    startRecordBtn.addEventListener("click", async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = event => {
+          if (event.data.size > 0) {
+            audioChunks.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          audioPlayback.src = audioUrl;
+          audioPlayback.style.display = "block"; // 再生プレイヤーを表示
+          
+          // マイクへのアクセスを解放
+          stream.getTracks().forEach(track => track.stop());
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        
+        // UIの更新
+        startRecordBtn.disabled = true;
+        startRecordBtn.classList.replace("btn-main", "btn-sub");
+        stopRecordBtn.disabled = false;
+        stopRecordBtn.classList.replace("btn-sub", "btn-main");
+        
+        recordStatus.textContent = "録音中...";
+        recordStatus.classList.add("recording");
+        audioPlayback.style.display = "none"; // 前回の録音を隠す
+        
+      } catch (err) {
+        console.error("マイクのアクセスに失敗しました:", err);
+        showMessage("マイクへのアクセスが許可されていません");
+      }
     });
 
-    showRandomOdai();
-    setPreset(10);
+    stopRecordBtn.addEventListener("click", () => {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+        
+        // UIの更新
+        startRecordBtn.disabled = false;
+        startRecordBtn.classList.replace("btn-sub", "btn-main");
+        stopRecordBtn.disabled = true;
+        stopRecordBtn.classList.replace("btn-main", "btn-sub");
+        
+        recordStatus.textContent = "録音完了";
+        recordStatus.classList.remove("recording");
+      }
+    });
   </script>
 </body>
 </html>
